@@ -1,0 +1,21 @@
+http:
+  # Add the router
+  routers:
+    downy:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`${HOSTNAME}`)"
+      service: "downy"
+      tls:
+        certResolver: "le"
+
+  # Add the service
+  services:
+    downy:
+      loadBalancer:
+        healthCheck:
+          path: /
+          interval: "3600s"
+          timeout: "3s"
+        servers:
+          - url: "${ENDPOINT}"

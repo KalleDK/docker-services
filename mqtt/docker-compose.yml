@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  server:
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "config:/mosquitto/config"
+      - "log:/mosquitto/log"
+      - "data:/mosquitto/data"
+    networks:
+      public:
+        ipv6_address: ${IPV6}
+    logging:
+        driver: "journald"
+
+volumes:
+  config:
+  data:
+  log:
+
+networks:
+  public:
+    external:
+      name: public

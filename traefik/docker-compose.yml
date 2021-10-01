@@ -1,0 +1,57 @@
+version: "3.7"
+
+services:
+  server:
+    image: traefik:v2.5
+    restart: always
+    command:
+      - --entrypoints.websecure.address=[${IP_OUTSIDE}]:443
+      - --entrypoints.websecure_mgmt.address=[${IP_MGMT}]:443
+      - --providers.docker
+      - --providers.docker.network=traefik_inside
+      - --providers.docker.exposedByDefault=false
+      - --providers.file
+      - --providers.file.directory=/conf/services
+      - --providers.file.watch=true
+      - --certificatesresolvers.le.acme.email=${ACME_MAIL}
+      - --certificatesresolvers.le.acme.storage=/var/lib/traefik/acme.json
+      - --certificatesresolvers.le.acme.dnsChallenge=true
+      - --certificatesResolvers.le.acme.dnsChallenge.provider=cloudflare
+      - --api
+      - --api.dashboard
+    environment:
+      - CF_DNS_API_TOKEN=${ACME_TOKEN}
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/var/lib/traefik
+      - conf:/conf
+    networks:
+      outside:
+        ipv6_address: ${IP_OUTSIDE}
+      mgmt:
+        ipv6_address: ${IP_MGMT}
+      inside:
+        ipv6_address: ${IP_INSIDE}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`${MGMT_HOST}`)
+      - traefik.http.routers.api.entrypoints=websecure_mgmt
+      - traefik.http.routers.api.tls.certresolver=le
+      - traefik.http.routers.api.service=api@internal
+
+volumes:
+  certs:
+  conf:
+
+networks:
+  outside:
+    external:
+      name: traefik_outside
+  mgmt:
+    external:
+      name: traefik_mgmt
+  inside:
+    external:
+      name: traefik_inside
