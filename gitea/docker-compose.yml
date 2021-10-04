@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  server:
+    image: gitea/gitea:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitea.rule=Host(`${HOSTNAME}`)
+      - traefik.http.routers.gitea.tls.certresolver=le
+      - traefik.http.routers.gitea.entrypoints=websecure
+      - traefik.http.services.gitea.loadbalancer.server.port=3000
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - RUN_MODE=prod
+      - SSH_DOMAIN=${SSH_HOSTNAME}
+      - ROOT_URL="https://${HOSTNAME}"
+      - SECRET_KEY
+      - DISABLE_REGISTRATION=true
+      - REQUIRE_SIGNIN_VIEW=true
+    restart: always
+    networks:
+      traefik:
+        ipv6_address: ${IPV6}
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - data:/data
+
+networks:
+  traefik:
+    external:
+      name: traefik_inside
+
+volumes:
+  data:

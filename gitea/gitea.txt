@@ -1,0 +1,1 @@
+docker-compose exec -u 1000 -w /data/backup server bash -c '/app/gitea/gitea dump -f backup.zip'
