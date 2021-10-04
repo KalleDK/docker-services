@@ -1,7 +1,7 @@
 SERVICE := mqtt
 
 include ../tools/Makefile.mk
-include ${ENV_DIR}/runtime.env
+include ../tools/Makefile.env
 
 include ../tools/Makefile.Docker.mk
 
