@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  server:
+    image: influxdb:2.0-alpine
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.influxdb.rule=Host(`${HOSTNAME}`)
+      - traefik.http.routers.influxdb.tls.certresolver=le
+      - traefik.http.routers.influxdb.entrypoints=websecure
+      - traefik.http.services.influxdb.loadbalancer.server.port=8086
+    volumes:
+      - data:/var/lib/influxdb2
+      - config:/etc/influxdb2
+    networks:
+      traefik:
+        ipv6_address: ${IPV6}
+
+volumes:
+  data:
+  config:
+
+networks:
+  traefik:
+    external:
+      name: traefik_inside
