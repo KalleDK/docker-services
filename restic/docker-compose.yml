@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  client:
+    image: restic/restic
+    environment:
+      - RESTIC_PASSWORD
+      - RESTIC_REPOSITORY
+    volumes:
+      - cache:/root/.cache
+    logging:
+      driver: journald
+
+volumes:
+  cache:
+
