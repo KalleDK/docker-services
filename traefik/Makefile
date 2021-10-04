@@ -1,12 +1,11 @@
-.PHONY: install build uninstall
-
 SERVICE := traefik
 
 include ../tools/Makefile.mk
-include ../tools/Makefile.Docker.mk
 include ${ENV_DIR}/runtime.env
 
-install: install_networks
+include ../tools/Makefile.Docker.mk
+
+install:
 	$(DC) up --no-start
 	$(DC) run --rm --entrypoint mkdir server -p /conf/services
 	$(DC) run --rm --entrypoint mkdir server -p /conf/auth
