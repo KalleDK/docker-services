@@ -5,8 +5,8 @@ services:
     image: traefik:v2.5
     restart: always
     command:
-      - --entrypoints.websecure.address=[${IP_OUTSIDE}]:443
-      - --entrypoints.websecure_mgmt.address=[${IP_MGMT}]:443
+      - --entrypoints.websecure.address=[${IP_outside}]:443
+      - --entrypoints.websecure_mgmt.address=[${IP_mgmt}]:443
       - --providers.docker
       - --providers.docker.network=traefik_inside
       - --providers.docker.exposedByDefault=false
@@ -29,11 +29,11 @@ services:
       - conf:/conf
     networks:
       outside:
-        ipv6_address: ${IP_OUTSIDE}
+        ipv6_address: ${IP_outside}
       mgmt:
-        ipv6_address: ${IP_MGMT}
+        ipv6_address: ${IP_mgmt}
       inside:
-        ipv6_address: ${IP_INSIDE}
+        ipv6_address: ${IP_inside}
     labels:
       - traefik.enable=true
       - traefik.http.routers.api.rule=Host(`${MGMT_HOST}`)

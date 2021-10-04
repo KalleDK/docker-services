@@ -1,38 +1,18 @@
-.PHONY: install build uninstall run logs
+.PHONY: install build uninstall
 
--include build/.env
+SERVICE := traefik
 
-build:
-	test -n "${BW_SESSION}" || exit 1
-	mkdir -p build
-	cd build && bwenv get traefik_prod
+include ../tools/Makefile.mk
+include ../tools/Makefile.Docker.mk
+include ${ENV_DIR}/runtime.env
 
-logs:
-	docker-compose --project-directory /srv/traefik logs
+install: install_networks
+	$(DC) up --no-start
+	$(DC) run --rm --entrypoint mkdir server -p /conf/services
+	$(DC) run --rm --entrypoint mkdir server -p /conf/auth
+	$(DC) run --rm --entrypoint touch server /conf/auth/htpasswd
+	cat auth.yml | $(DC) run --rm --entrypoint tee server /conf/services/auth.yml
 
-run:
-	docker-compose --project-directory /srv/traefik up -d
+install_networks: dnet_inside dnet_outside dnet_mgmt
 
-install:
-	mkdir -p /srv/traefik
-	cp docker-compose.yml /srv/traefik/docker-compose.yml
-	cp build/.env /srv/traefik/.env
-	docker network create --ipv6 --subnet ${NET_OUTSIDE} --gateway ${GW_OUTSIDE} traefik_outside
-	docker network create --ipv6 --subnet ${NET_MGMT} --gateway ${GW_MGMT} traefik_mgmt
-	docker network create --ipv6 --subnet ${NET_INSIDE} --gateway ${GW_INSIDE} traefik_inside
-	docker-compose --project-directory /srv/traefik up --no-start
-	docker-compose --project-directory /srv/traefik run --rm --entrypoint mkdir server -p /conf/services
-	docker-compose --project-directory /srv/traefik run --rm --entrypoint mkdir server -p /conf/auth
-	docker-compose --project-directory /srv/traefik run --rm --entrypoint touch server /conf/auth/htpasswd
-	cat auth.yml | docker-compose --project-directory /srv/traefik run --rm --entrypoint tee server /conf/services/auth.yml
-
-uninstall:
-	docker-compose --project-directory /srv/traefik down -v
-	docker network rm traefik_outside
-	docker network rm traefik_inside
-	docker network rm traefik_mgmt
-	rm -r /srv/traefik
-
-
-clean:
-	rm -rf build
+uninstall_networks: rnet_inside rnet_outside rnet_mgmt

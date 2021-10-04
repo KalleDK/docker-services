@@ -1,28 +1,40 @@
 BUILD_DIR := obj
+ENV_DIR := env
 BW_CONF := /usr/local/etc/bwenv.json
 BWENV := bwenv --config ${BW_CONF}
+SERVICE_DIR := /srv/${SERVICE}
 
-install_custom: 
+install_pre: 
 
-install: install_custom
-	echo install
+install_service:
 
-${BUILD_DIR}:
-	mkdir -p ${BUILD_DIR}
+install: install_pre install_service
 
-build/docker-compose.yml: gen
-	cp docker-compose.yml ${BUILD_DIR}/docker-compose.yml
+uninstall_pre:
 
+uninstall_service:
+
+uninstall: uninstall_pre uninstall_service
+
+build_pre:
+
+build_service:
+
+build: build_pre build_service
+
+
+${BUILD_DIR} ${ENV_DIR}:
+	mkdir -p $@
 
 clean:
 	rm -rf ${BUILD_DIR}
-	rm -f ${FORCE_FILE}
+	rm -rf ${ENV_DIR}
 
-FORCE_FILE := .force
+${BUILD_DIR}/%.env: ${BUILD_DIR}
+	$(BWENV) get ${SERVICE} -o $@
 
-${FORCE_FILE}:
-	@touch ${FORCE_FILE}
+${BUILD_DIR}/.env: ${BUILD_DIR}
+	$(BWENV) get ${SERVICE} -o $@
 
-.PHONY: force
-force:
-	@touch ${FORCE_FILE}
+${ENV_DIR}/%.env: ${ENV_DIR}
+	$(BWENV) get ${SERVICE} -o $@
