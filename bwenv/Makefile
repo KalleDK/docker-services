@@ -14,7 +14,8 @@ endif
 
 
 ${BUILD_DIR}/bwenv: ${BUILD_DIR}
-	wget -L -O "$@" "https://raw.githubusercontent.com/KalleDK/py-bwenv/main/bwenv.py"
+	@echo downloading bwenv
+	wget -L -O "$@" "https://raw.githubusercontent.com/KalleDK/py-bwenv/main/bwenv.py" > /dev/null 2>&1
 	sed -i 's#default="bwenv.json"#default="/usr/local/etc/bwenv.json"#' "$@"
 	chmod +x "$@"
 
