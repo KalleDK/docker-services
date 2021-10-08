@@ -7,6 +7,8 @@ services:
       - RESTIC_PASSWORD
       - RESTIC_REPOSITORY
     volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
       - cache:/root/.cache
     logging:
       driver: journald

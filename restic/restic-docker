@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+ACTION=$1
+shift;
+SERVICE=$1
+shift;
+VOLUME=$1
+shift;
+
+RESTIC_DIR=/srv/restic
+HOST=$(hostname)
+VOL=${SERVICE}_${VOLUME}
+
+if [ "${ACTION}" = "backup" ]; then
+	/usr/bin/docker-compose --file ${RESTIC_DIR}/docker-compose.yml --project-directory ${RESTIC_DIR} run --rm -v ${VOL}:/vol/${VOL} client backup /vol/${VOL} --host ${HOST} --tag ${SERVICE} --tag docker "$@"
+elif [ "${ACTION}" = "restore" ]; then
+	/usr/bin/docker-compose --file ${RESTIC_DIR}/docker-compose.yml --project-directory ${RESTIC_DIR} run --rm -v ${VOL}:/vol/${VOL} client restore --host ${HOST} --path /vol/${VOL} --target / latest
+fi;
+
+

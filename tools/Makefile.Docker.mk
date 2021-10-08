@@ -3,10 +3,10 @@ DC := docker-compose --project-directory ${SERVICE_DIR} -f ${SERVICE_DIR}/docker
 ${SERVICE_DIR}:
 	mkdir -p ${SERVICE_DIR}
 
-${SERVICE_DIR}/docker-compose.yml: ${SERVICE_DIR} ${BUILD_DIR}/docker-compose.yml
+${SERVICE_DIR}/docker-compose.yml: ${BUILD_DIR}/docker-compose.yml | ${SERVICE_DIR}
 	cp ${BUILD_DIR}/docker-compose.yml ${SERVICE_DIR}/docker-compose.yml
 
-${SERVICE_DIR}/.env: ${SERVICE_DIR} ${BUILD_DIR}/runtime.env
+${SERVICE_DIR}/.env: ${BUILD_DIR}/runtime.env | ${SERVICE_DIR}
 	cp ${BUILD_DIR}/runtime.env ${SERVICE_DIR}/.env
 
 install_networks:
@@ -21,7 +21,7 @@ uninstall_dir:
 uninstall_service: remove uninstall_networks uninstall_dir
 
 
-${BUILD_DIR}/docker-compose.yml: ${BUILD_DIR} docker-compose.yml
+${BUILD_DIR}/docker-compose.yml: docker-compose.yml | ${BUILD_DIR}
 	cp docker-compose.yml ${BUILD_DIR}/docker-compose.yml
 
 build_service: ${BUILD_DIR}/docker-compose.yml ${BUILD_DIR}/runtime.env

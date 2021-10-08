@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+docker run --rm -i -t -v gotify_data:/data kadock/sqlite sqlite3 /data/gotify.db ".backup /data/gotify.backup.db"
+/usr/local/bin/restic-docker backup gotify data --exclude="gotify.db"

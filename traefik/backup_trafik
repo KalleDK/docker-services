@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+/usr/local/bin/restic-docker backup traefik conf > /dev/null 

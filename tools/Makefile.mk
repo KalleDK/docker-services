@@ -23,18 +23,18 @@ build_service:
 build: build_pre build_service
 
 
-${BUILD_DIR} ${ENV_DIR}:
+${BUILD_DIR}:
+	mkdir -p $@
+
+${ENV_DIR}:
 	mkdir -p $@
 
 clean:
 	rm -rf ${BUILD_DIR}
 	rm -rf ${ENV_DIR}
 
-${BUILD_DIR}/%.env: ${BUILD_DIR}
+${BUILD_DIR}/%.env: | ${BUILD_DIR}
 	$(BWENV) get ${SERVICE} -o $@
 
-${BUILD_DIR}/.env: ${BUILD_DIR}
-	$(BWENV) get ${SERVICE} -o $@
-
-${ENV_DIR}/%.env: ${ENV_DIR}
+${ENV_DIR}/%.env: | ${ENV_DIR}
 	$(BWENV) get ${SERVICE} -o $@
