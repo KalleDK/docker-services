@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+/usr/local/bin/restic-docker backup mqtt data
+/usr/local/bin/restic-docker backup mqtt config

@@ -18,6 +18,12 @@ services:
         ipv6_address: ${IPV6}
     logging:
         driver: "journald"
+    healthcheck:
+      test: ["CMD", "/usr/bin/mosquitto_pub", "-h", "localhost", "-p", "1883", "-t", "healthcheck", "-m", "ok"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   config:
