@@ -10,5 +10,6 @@ install:
 	$(DC) up --no-start
 
 restore:
+	restic-docker restore gotify data
 	docker run --rm -i -t -v gotify_data:/data kadock/sqlite sqlite3 /data/gotify.db ".restore /data/gotify.backup.db"
 
