@@ -1,7 +1,6 @@
 BUILD_DIR := obj
 ENV_DIR := env
-BW_CONF := /usr/local/etc/bwenv.json
-BWENV := bwenv --config ${BW_CONF}
+BWENV := bwenv
 SERVICE_DIR := /srv/${SERVICE}
 
 install_pre: 

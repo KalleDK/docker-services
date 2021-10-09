@@ -3,16 +3,25 @@ version: "3.7"
 services:
   client:
     image: restic/restic
+    hostname: ${HOSTNAME}
     environment:
       - RESTIC_PASSWORD
       - RESTIC_REPOSITORY
+      - VOLUME
+      - SERVICE
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - cache:/root/.cache
+      - backup:/vol/${VOLUME}
+      - ./entrypoint.sh:/entrypoint.sh:ro
     logging:
       driver: journald
+    entrypoint: /entrypoint.sh
 
 volumes:
   cache:
+  backup:
+    external:
+      name: ${VOLUME}
 
