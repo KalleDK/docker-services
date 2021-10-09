@@ -12,3 +12,11 @@ install:
 init:
 	cat mosquitto.conf | $(DC) run --rm --entrypoint tee server /mosquitto/config/mosquitto.conf
 	$(DC) run --rm --entrypoint mosquitto_passwd server -b -c /mosquitto/config/passwd ${MQTT_USER} ${MQTT_PASS}
+
+backup:
+	/usr/local/bin/restic-docker backup mqtt data
+	/usr/local/bin/restic-docker backup mqtt config
+
+restore:
+	/usr/local/bin/restic-docker restore mqtt data
+	/usr/local/bin/restic-docker restore mqtt config

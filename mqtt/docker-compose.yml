@@ -19,7 +19,7 @@ services:
     logging:
         driver: "journald"
     healthcheck:
-      test: ["CMD", "/usr/bin/mosquitto_pub", "-h", "localhost", "-p", "1883", "-t", "healthcheck", "-m", "ok"]
+      test: /usr/bin/mosquitto_sub -h localhost -p 1883 -C 1 -t \$$SYS/broker/version || exit 1
       interval: 1m30s
       timeout: 10s
       retries: 3
