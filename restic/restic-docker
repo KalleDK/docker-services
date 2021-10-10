@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
+ACTION="$1"; shift
 SERVICE="$1"; shift
 VOL="$1"; shift
-ACTION="$1"; shift
 
 
 VOLUME=${SERVICE}_${VOL}
