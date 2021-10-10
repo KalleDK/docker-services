@@ -1,17 +1,37 @@
 #!/usr/bin/env sh
 
-ACTION="$1"
-shift
-
-SERV="$1"
-shift
-
-VOL="$1"
-shift
-
-export SERVICE=${SERV}
-export VOLUME=${SERV}_${VOL}
-export HOSTNAME=$(hostname)
+SERVICE="$1"; shift
+VOL="$1"; shift
+ACTION="$1"; shift
 
 
-/usr/bin/docker-compose --file SERVICE_DIR/docker-compose.yml --project-directory SERVICE_DIR run --rm client ${ACTION} "$@"
+VOLUME=${SERVICE}_${VOL}
+HOSTNAME=$(hostname)
+VOLUME_PATH=/vol/${VOLUME}
+
+DOCKER=/usr/bin/docker
+
+DOCKER_RUN="${DOCKER} run --rm \
+	--hostname ${HOSTNAME} \
+        --volume restic_cache:/root/.cache \
+	--volume /usr/local/etc/restic:/usr/local/etc/restic:ro \
+	--env RESTIC_PASSWORD_FILE=/usr/local/etc/restic/secret \
+	--env RESTIC_REPOSITORY_FILE=/usr/local/etc/restic/repository \
+	--volume ${VOLUME}:${VOLUME_PATH} \
+	--workdir ${VOLUME_PATH}"
+
+${DOCKER} volume inspect ${VOLUME} >> /dev/null
+
+if [ "$?" -ne "0" ]; then
+	exit 1
+fi
+
+if [ "${ACTION}" = "console" ]; then
+	${DOCKER_RUN} --interactive --tty --entrypoint /bin/sh restic/restic
+elif [ "${ACTION}" = "snapshots" ]; then
+	${DOCKER_RUN} restic/restic snapshots --tag ${SERVICE} --path ${VOLUME_PATH}
+elif [ "${ACTION}" = "backup" ]; then
+	${DOCKER_RUN} restic/restic backup --tag ${SERVICE} --tag docker "$@" ${VOLUME_PATH}
+elif [ "${ACTION}" = "restore" ]; then
+	${DOCKER_RUN} restic/restic restore --host ${HOSTNAME} --path ${VOLUME_PATH} --target / "$@" latest
+fi
